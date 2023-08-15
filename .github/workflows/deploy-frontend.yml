@@ -16,9 +16,7 @@ jobs:
           persist-credentials: false
 
       - name: npm (install + build)
-        run: |
-          npm install
-          npm run build
+        run: npm install && npm run build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
