@@ -5,7 +5,6 @@
   const cardClick = (ev) => {
     const content = ev.target.parentNode.querySelector(".card-content");
     content.classList.toggle("hide");
-    console.log(content);
   };
 </script>
 
@@ -29,7 +28,7 @@
     box-sizing: border-box;
     width: 24%;
     border: 1px #000 solid;
-    margin: 12px 0;
+    margin: 12px 0.5%;
     cursor: pointer;
   }
 
