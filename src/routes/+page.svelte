@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Card from "$lib/Card.svelte";
-  import type { ChangeEventHandler } from "svelte/elements";
 
   const DB_URL = "https://pigeonblog-db-default-rtdb.firebaseio.com";
 
@@ -33,6 +32,7 @@
 
   const toDate = (e: number) =>
     new Date(e).toLocaleDateString("en-us", {
+      timeZone: "UTC",
       weekday: "long",
       year: "numeric",
       month: "short",
