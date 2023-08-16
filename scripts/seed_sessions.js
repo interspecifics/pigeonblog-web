@@ -107,7 +107,7 @@ const update_sessions = async (unique_days, token) => {
     try {
       const res = await request("PUT", put_url, true);
       const res_obj = JSON.parse(res);
-      console.log(res_obj);
+      console.log(d, res_obj);
     } catch (e) {
       console.log(e);
     }
