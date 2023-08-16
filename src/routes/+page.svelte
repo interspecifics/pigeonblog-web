@@ -16,7 +16,7 @@
     const measurements = Object.keys(_measurements).map(
       (k) => _measurements[k]
     );
-    return measurements;
+    return measurements.sort((a, b) => a.timestamp - b.timestamp);
   };
 
   const loadSessions = async () => {
@@ -29,7 +29,7 @@
   const selectSession = (ev: InputEvent) => {
     const element = ev.target as HTMLInputElement;
     session = parseInt(element.value);
-  }
+  };
 
   const toDate = (e: number) =>
     new Date(e).toLocaleDateString("en-us", {
