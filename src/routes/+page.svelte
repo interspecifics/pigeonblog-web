@@ -10,25 +10,24 @@
     dts = dts || 1;
     const dtsp1 = dts + 24 * 60 * 60 * 1000;
 
-    const res = await fetch(
-      `${DB_URL}/measurements.json?orderBy="timestamp"&startAt=${dts}&endAt=${dtsp1}`
-    );
-    const _measurements = await res.json();
-    const measurements = Object.keys(_measurements).map(
-      (k) => _measurements[k]
-    );
+    const getUrl = `${DB_URL}/measurements.json`;
+    const getParams = `orderBy="timestamp"&startAt=${dts}&endAt=${dtsp1}`;
+
+    const res = await fetch(`${getUrl}?${getParams}`);
+    const mObjs = await res.json();
+    const measurements = Object.keys(mObjs).map((k) => mObjs[k]);
     return measurements.sort((a, b) => a.timestamp - b.timestamp);
   };
 
   const loadSessions = async () => {
     const res = await fetch(`${DB_URL}/sessions.json`);
-    const _sessions = await res.json();
-    const sessions = Object.keys(_sessions).map((k) => parseInt(k));
+    const sObjs = await res.json();
+    const sessions = Object.keys(sObjs).map((k) => parseInt(k));
     return sessions;
   };
 
   const selectSession = (ev: Event) => {
-    const element = ev.target as HTMLInputElement;
+    const element = ev.target as HTMLSelectElement;
     session = parseInt(element.value);
   };
 
@@ -43,16 +42,15 @@
 
   let session: number = 0;
   let sessions: number[] = [];
-  let measurements: Promise<Measurement[]>;
+  let measurementsP: Promise<Measurement[]>;
 
   onMount(async () => {
     sessions = await loadSessions();
     session = sessions[0];
   });
 
-  $: measurements = loadMeasurements(session);
+  $: measurementsP = loadMeasurements(session);
 </script>
-
 
 <select on:change={selectSession}>
   {#each sessions as s}
@@ -60,11 +58,11 @@
   {/each}
 </select>
 
-{#await measurements}
+{#await measurementsP}
   <p>...waiting</p>
-{:then measurements_objs}
+{:then measurements}
   <div class="cards-container">
-    {#each measurements_objs as measurement}
+    {#each measurements as measurement}
       <Card {measurement} />
     {/each}
   </div>
