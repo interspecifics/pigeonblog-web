@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+
   import type { Measurement } from "$lib/types";
 
-  import { onMount } from "svelte";
   import Card from "$lib/Card.svelte";
+  import Map from "$lib/Map.svelte";
 
   const DB_URL = "https://pigeonblog-db-default-rtdb.firebaseio.com";
 
@@ -76,6 +78,10 @@
   <div>Pigeons:</div>
   <div>{getPigeons(measurements).join(", ")}</div>
 
+  <div class="map-container">
+    <Map {measurements} />
+  </div>
+
   <div class="cards-container">
     {#each measurements as measurement}
       <Card {measurement} />
@@ -94,5 +100,9 @@
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: flex-start;
+  }
+  .map-container {
+    width: 100%;
+    height: 80vh;
   }
 </style>
