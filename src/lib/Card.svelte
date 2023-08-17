@@ -3,9 +3,6 @@
 
   export let measurement: Measurement;
 
-  const trunc = (v: number): string => v.toFixed(4);
-  const toDate = (e: number): string => new Date(e).toISOString();
-
   const cardClick = (ev: MouseEvent): void => {
     const element = ev.target as HTMLDivElement;
     const content = element.parentNode?.querySelector(".card-content");
@@ -15,15 +12,16 @@
 
 <div class="card-container">
   <button class="card-title" on:click={cardClick}>
-    {toDate(measurement.timestamp)}
+    {new Date(measurement.timestamp).toISOString()}
   </button>
   <div class="card-content hide">
     <div class="">Pigeon: {measurement.pigeon}</div>
     <div class="">
-      Location: ({trunc(measurement.lat)}, {trunc(measurement.lon)})
+      Location: ({measurement.lat.toFixed(4)}, {measurement.lon.toFixed(4)})
     </div>
     <div class="">
-      Temp: {trunc(measurement.temp)}, Press: {trunc(measurement.pres)}, Alt: {trunc(measurement.alti)}
+      Temp: {measurement.temp.toFixed(2)}, Press: {measurement.pres.toFixed(2)},
+      Alt: {measurement.alti.toFixed(2)}
     </div>
     <div class="">
       NH3: {measurement.NH3}, OXI: {measurement.OXI}, RED: {measurement.RED}
