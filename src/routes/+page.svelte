@@ -6,8 +6,7 @@
 
   const DB_URL = "https://pigeonblog-db-default-rtdb.firebaseio.com";
 
-  const loadMeasurements = async (dts: number): Promise<Measurement[]> => {
-    dts = dts || 1;
+  const getMeasurements = async (dts: number): Promise<Measurement[]> => {
     const dtsp1 = dts + 24 * 60 * 60 * 1000;
 
     const getUrl = `${DB_URL}/measurements.json`;
@@ -19,17 +18,17 @@
     return measurements.sort((a, b) => a.timestamp - b.timestamp);
   };
 
-  const loadSessions = async (): Promise<number[]> => {
+  const getSessions = async (): Promise<number[]> => {
     const res = await fetch(`${DB_URL}/sessions.json`);
     const sObjs = await res.json();
     const sessions = Object.keys(sObjs).map((k) => parseInt(k));
     return sessions;
   };
 
-  const selectSession = (ev: Event): void => {
+  const loadSession = (ev: Event): void => {
     const element = ev.target as HTMLSelectElement;
     sessionTimestamp = parseInt(element.value);
-    measurementsP = loadMeasurements(sessionTimestamp);
+    measurementsP = getMeasurements(sessionTimestamp);
   };
 
   const getPigeons = (ms: Measurement[]): number[] => {
@@ -46,22 +45,30 @@
       day: "numeric",
     });
 
-  let sessionTimestamp: number = 0;
-  let sessions: number[] = [];
+  let sessionTimestamp: number;
+  let sessionsP: Promise<number[]> = new Promise(() => {});
   let measurementsP: Promise<Measurement[]> = new Promise(() => {});
 
   onMount(async () => {
-    sessions = await loadSessions();
-    sessionTimestamp = sessions[0];
-    measurementsP = loadMeasurements(sessionTimestamp);
+    sessionsP = getSessions();
+    sessionsP.then((sessions) => {
+      sessionTimestamp = sessions[0];
+      measurementsP = getMeasurements(sessionTimestamp);
+    });
   });
 </script>
 
-<select on:change={selectSession}>
-  {#each sessions as s}
-    <option value={s}>{toDate(s)}</option>
-  {/each}
-</select>
+{#await sessionsP}
+  <p>...waiting</p>
+{:then sessions}
+  <select on:change={loadSession}>
+    {#each sessions as s}
+      <option value={s}>{toDate(s)}</option>
+    {/each}
+  </select>
+{:catch error}
+  <p style="color: red">{error.message}</p>
+{/await}
 
 {#await measurementsP}
   <p>...waiting</p>
