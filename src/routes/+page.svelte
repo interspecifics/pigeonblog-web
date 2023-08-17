@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Measurement } from "$lib/types";
+
   import { onMount } from "svelte";
   import Card from "$lib/Card.svelte";
 
@@ -25,7 +27,7 @@
     return sessions;
   };
 
-  const selectSession = (ev: InputEvent) => {
+  const selectSession = (ev: Event) => {
     const element = ev.target as HTMLInputElement;
     session = parseInt(element.value);
   };
@@ -41,7 +43,7 @@
 
   let session: number = 0;
   let sessions: number[] = [];
-  let measurements;
+  let measurements: Promise<Measurement[]>;
 
   onMount(async () => {
     sessions = await loadSessions();

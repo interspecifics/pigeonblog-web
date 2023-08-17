@@ -1,5 +1,7 @@
 <script lang="ts">
-  export let measurement;
+  import type { Measurement } from "$lib/types";
+
+  export let measurement: Measurement;
 
   const trunc = (v: number) => v.toFixed(4);
   const toDate = (e: number) => new Date(e).toISOString();
