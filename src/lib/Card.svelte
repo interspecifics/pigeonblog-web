@@ -3,10 +3,10 @@
 
   export let measurement: Measurement;
 
-  const trunc = (v: number) => v.toFixed(4);
-  const toDate = (e: number) => new Date(e).toISOString();
+  const trunc = (v: number): string => v.toFixed(4);
+  const toDate = (e: number): string => new Date(e).toISOString();
 
-  const cardClick = (ev: MouseEvent) => {
+  const cardClick = (ev: MouseEvent): void => {
     const element = ev.target as HTMLDivElement;
     const content = element.parentNode?.querySelector(".card-content");
     content?.classList.toggle("hide");
@@ -20,7 +20,10 @@
   <div class="card-content hide">
     <div class="">Pigeon: {measurement.pigeon}</div>
     <div class="">
-      Loc: ({trunc(measurement.lat)}, {trunc(measurement.lon)})
+      Location: ({trunc(measurement.lat)}, {trunc(measurement.lon)})
+    </div>
+    <div class="">
+      Temp: {trunc(measurement.temp)}, Press: {trunc(measurement.pres)}, Alt: {trunc(measurement.alti)}
     </div>
     <div class="">
       NH3: {measurement.NH3}, OXI: {measurement.OXI}, RED: {measurement.RED}

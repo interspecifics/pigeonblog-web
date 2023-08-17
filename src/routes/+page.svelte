@@ -6,7 +6,7 @@
 
   const DB_URL = "https://pigeonblog-db-default-rtdb.firebaseio.com";
 
-  const loadMeasurements = async (dts: number) => {
+  const loadMeasurements = async (dts: number): Promise<Measurement[]> => {
     dts = dts || 1;
     const dtsp1 = dts + 24 * 60 * 60 * 1000;
 
@@ -15,23 +15,29 @@
 
     const res = await fetch(`${getUrl}?${getParams}`);
     const mObjs = await res.json();
-    const measurements = Object.keys(mObjs).map((k) => mObjs[k]);
+    const measurements: Measurement[] = Object.values(mObjs);
     return measurements.sort((a, b) => a.timestamp - b.timestamp);
   };
 
-  const loadSessions = async () => {
+  const loadSessions = async (): Promise<number[]> => {
     const res = await fetch(`${DB_URL}/sessions.json`);
     const sObjs = await res.json();
     const sessions = Object.keys(sObjs).map((k) => parseInt(k));
     return sessions;
   };
 
-  const selectSession = (ev: Event) => {
+  const selectSession = (ev: Event): void => {
     const element = ev.target as HTMLSelectElement;
-    session = parseInt(element.value);
+    sessionTimestamp = parseInt(element.value);
+    measurementsP = loadMeasurements(sessionTimestamp);
   };
 
-  const toDate = (e: number) =>
+  const getPigeons = (ms: Measurement[]): number[] => {
+    const pigeonSet = ms.reduce((a, m) => a.add(m.pigeon), new Set<number>());
+    return Array.from(pigeonSet).sort();
+  };
+
+  const toDate = (e: number): string =>
     new Date(e).toLocaleDateString("en-us", {
       timeZone: "UTC",
       weekday: "long",
@@ -40,16 +46,15 @@
       day: "numeric",
     });
 
-  let session: number = 0;
+  let sessionTimestamp: number = 0;
   let sessions: number[] = [];
-  let measurementsP: Promise<Measurement[]>;
+  let measurementsP: Promise<Measurement[]> = new Promise(() => {});
 
   onMount(async () => {
     sessions = await loadSessions();
-    session = sessions[0];
+    sessionTimestamp = sessions[0];
+    measurementsP = loadMeasurements(sessionTimestamp);
   });
-
-  $: measurementsP = loadMeasurements(session);
 </script>
 
 <select on:change={selectSession}>
@@ -61,6 +66,9 @@
 {#await measurementsP}
   <p>...waiting</p>
 {:then measurements}
+  <div>Pigeons:</div>
+  <div>{getPigeons(measurements).join(", ")}</div>
+
   <div class="cards-container">
     {#each measurements as measurement}
       <Card {measurement} />
