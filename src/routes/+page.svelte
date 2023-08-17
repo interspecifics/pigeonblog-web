@@ -53,7 +53,6 @@
   $: measurements = loadMeasurements(session);
 </script>
 
-<h2>HOME</h2>
 
 <select on:change={selectSession}>
   {#each sessions as s}
