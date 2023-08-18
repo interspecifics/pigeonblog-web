@@ -1,25 +1,23 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Map } from "mapbox-gl";
+  import { type GeoJSONSource, Map } from "mapbox-gl";
+  import { type Measurement, Sensors } from "$lib/types";
 
   import "../../node_modules/mapbox-gl/dist/mapbox-gl.css";
 
-  import type mapboxgl from "mapbox-gl";
-  import { type Measurement, Sensors } from "$lib/types";
+  export let measurements: Measurement[] = [];
 
-  export let measurements: Measurement[];
-
-  let map: mapboxgl.Map;
+  let map: Map;
   let mapContainer: HTMLElement;
 
-  onMount(() => {
-    const geoJson: { [sensorId: string]: any } = {};
+  const SENSOR_COLORS: { [key in Sensors]: string } = {
+    RED: "rgba(200, 20, 20, 0.5)",
+    NH3: "rgba(20, 200, 20, 0.5)",
+    OXI: "rgba(20, 20, 200, 0.5)",
+  };
 
-    const sensorColors: { [key in Sensors]: string } = {
-      RED: "rgba(200, 20, 20, 0.5)",
-      NH3: "rgba(20, 200, 20, 0.5)",
-      OXI: "rgba(20, 20, 200, 0.5)",
-    };
+  const updateMapSources = () => {
+    const geoJson: { [sensorId: string]: any } = {};
 
     Object.values(Sensors).forEach((sensor) => {
       geoJson[sensor] = {
@@ -44,6 +42,16 @@
       };
     });
 
+    Object.values(Sensors).forEach((sensor) => {
+      if (map.getSource(sensor)) {
+        (map.getSource(sensor) as GeoJSONSource).setData(geoJson[sensor].data);
+      } else {
+        map.addSource(sensor, geoJson[sensor]);
+      }
+    });
+  };
+
+  onMount(() => {
     map = new Map({
       accessToken:
         "pk.eyJ1IjoidGhlcnNhbiIsImEiOiJjbGxmcTY0OGcwdzZxM3NuZ3YyMWpqb3Q4In0.LXXJ8kkXYy2eZa8x0g_6cA",
@@ -54,8 +62,9 @@
     });
 
     map.on("load", () => {
+      updateMapSources();
+
       Object.values(Sensors).forEach((sensor) => {
-        map.addSource(sensor, geoJson[sensor]);
         map.addLayer({
           id: sensor,
           type: "circle",
@@ -64,7 +73,7 @@
             visibility: "visible",
           },
           paint: {
-            "circle-color": sensorColors[sensor],
+            "circle-color": SENSOR_COLORS[sensor],
             "circle-radius": [
               "interpolate",
               ["linear"],
@@ -79,6 +88,10 @@
       });
     });
   });
+
+  $: if (measurements.length > 0) {
+    updateMapSources();
+  }
 </script>
 
 <div id="map" class="map-container" bind:this={mapContainer} />

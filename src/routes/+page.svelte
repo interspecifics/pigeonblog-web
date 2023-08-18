@@ -31,6 +31,7 @@
     const element = ev.target as HTMLSelectElement;
     sessionTimestamp = parseInt(element.value);
     measurementsP = getMeasurements(sessionTimestamp);
+    measurementsP.then((m) => (mapMeasurements = m));
   };
 
   const getPigeons = (ms: Measurement[]): number[] => {
@@ -50,12 +51,14 @@
   let sessionTimestamp: number;
   let sessionsP: Promise<number[]> = new Promise(() => {});
   let measurementsP: Promise<Measurement[]> = new Promise(() => {});
+  let mapMeasurements: Measurement[] = [];
 
   onMount(async () => {
     sessionsP = getSessions();
     sessionsP.then((sessions) => {
       sessionTimestamp = sessions[0];
       measurementsP = getMeasurements(sessionTimestamp);
+      measurementsP.then((m) => (mapMeasurements = m));
     });
   });
 </script>
@@ -72,16 +75,22 @@
   <p style="color: red">{error.message}</p>
 {/await}
 
+<div>Pigeons:</div>
 {#await measurementsP}
-  <p>...waiting</p>
+  <div>...waiting</div>
 {:then measurements}
-  <div>Pigeons:</div>
   <div>{getPigeons(measurements).join(", ")}</div>
+{:catch error}
+  <p style="color: red">{error.message}</p>
+{/await}
 
-  <div class="map-container">
-    <Map {measurements} />
-  </div>
+<div class="map-container">
+  <Map measurements={mapMeasurements} />
+</div>
 
+{#await measurementsP}
+  <div>...waiting</div>
+{:then measurements}
   <div class="cards-container">
     {#each measurements as measurement}
       <Card {measurement} />
