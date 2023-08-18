@@ -101,6 +101,16 @@ const get_unique_days = async () => {
 };
 
 const update_sessions = async (unique_days, token) => {
+  const del_url = `${DB_URL}/sessions.json?auth=${token}`;
+
+  try {
+    const res = await request("DELETE", del_url, {});
+    const res_obj = JSON.parse(res);
+    console.log(res_obj);
+  } catch (e) {
+    console.log(e);
+  }
+
   Array.from(unique_days).forEach(async (d) => {
     const put_url = `${DB_URL}/sessions/${String(d)}.json?auth=${token}`;
 
