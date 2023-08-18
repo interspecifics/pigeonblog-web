@@ -5,22 +5,23 @@
   import "../../node_modules/mapbox-gl/dist/mapbox-gl.css";
 
   import type mapboxgl from "mapbox-gl";
-  import type { Measurement } from "$lib/types";
+  import { type Measurement, Sensors } from "$lib/types";
 
   export let measurements: Measurement[];
 
-  let map: mapboxgl;
+  let map: mapboxgl.Map;
   let mapContainer: HTMLElement;
 
   onMount(() => {
     const geoJson: { [sensorId: string]: any } = {};
 
-    const sensorColors = {
-      NH3: "rgba(20, 200, 20, 0.5)",
+    const sensorColors: { [key in Sensors]: string } = {
       RED: "rgba(200, 20, 20, 0.5)",
+      NH3: "rgba(20, 200, 20, 0.5)",
+      OXI: "rgba(20, 20, 200, 0.5)",
     };
 
-    ["NH3", "RED"].forEach((sensor) => {
+    Object.values(Sensors).forEach((sensor) => {
       geoJson[sensor] = {
         type: "geojson",
         data: {
@@ -53,7 +54,7 @@
     });
 
     map.on("load", () => {
-      ["NH3", "RED"].forEach((sensor) => {
+      Object.values(Sensors).forEach((sensor) => {
         map.addSource(sensor, geoJson[sensor]);
         map.addLayer({
           id: sensor,
