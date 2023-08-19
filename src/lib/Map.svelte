@@ -16,6 +16,11 @@
     OXI: "rgba(20, 20, 200, 0.5)",
   };
 
+  const LOC = {
+    LAT: 33.941755,
+    LON: -118.1146035,
+  };
+
   const updateMapSources = () => {
     const geoJson: { [sensorId: string]: any } = {};
 
@@ -59,17 +64,23 @@
     map.setLayoutProperty(sensor, "visibility", isActive ? "visible" : "none");
   };
 
+  const hideMapBoxAd = (): void => {
+    const mpcs = document.getElementsByClassName("mapboxgl-control-container");
+    (mpcs[0] as HTMLDivElement).style.display = "none";
+  };
+
   onMount(() => {
     map = new Map({
       accessToken:
         "pk.eyJ1IjoidGhlcnNhbiIsImEiOiJjbGxmcTY0OGcwdzZxM3NuZ3YyMWpqb3Q4In0.LXXJ8kkXYy2eZa8x0g_6cA",
       container: mapContainer,
       style: "mapbox://styles/mapbox/streets-v12",
-      center: [-118.2437, 34.0522],
+      center: [LOC.LON, LOC.LAT],
       zoom: 9,
     });
 
     map.on("load", () => {
+      hideMapBoxAd();
       updateMapSources();
 
       Object.values(Sensors).forEach((sensor) => {
@@ -119,9 +130,13 @@
 </div>
 
 <style lang="scss">
+  * {
+    box-sizing: border-box;
+  }
+
   .map-container {
     width: 100%;
-    height: 80vh;
+    height: 88vh;
     position: relative;
   }
 
