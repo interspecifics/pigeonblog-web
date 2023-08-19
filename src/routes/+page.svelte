@@ -89,23 +89,5 @@
 {#await measurementsP}
   <div>...waiting</div>
 {:then measurements}
-  <div class="cards-container">
-    {#each measurements as measurement}
-      <Card {measurement} />
-    {/each}
-  </div>
-{:catch error}
-  <p style="color: red">{error.message}</p>
+  <div>Loaded {measurements.length} data points</div>
 {/await}
-
-<style>
-  .cards-container {
-    box-sizing: border-box;
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-  }
-</style>
