@@ -84,9 +84,7 @@
   <p style="color: red">{error.message}</p>
 {/await}
 
-<div class="map-container">
-  <Map measurements={mapMeasurements} />
-</div>
+<Map measurements={mapMeasurements} />
 
 {#await measurementsP}
   <div>...waiting</div>
@@ -109,9 +107,5 @@
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: flex-start;
-  }
-  .map-container {
-    width: 100%;
-    height: 80vh;
   }
 </style>
