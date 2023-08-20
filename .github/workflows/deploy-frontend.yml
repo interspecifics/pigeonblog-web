@@ -15,8 +15,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: seed sessions in db
-        run: npm run seed
+      - name: update sessions in db
+        run: npm run update-sessions
         if: false
         env:
           API_KEY: ${{ secrets.API_KEY }}
