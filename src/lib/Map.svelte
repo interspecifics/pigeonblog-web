@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { type GeoJSONSource, Map } from "mapbox-gl";
-  import { type Measurement, Sensors } from "$lib/types";
+  import { type Measurement, Sensors, type Session } from "$lib/types";
 
   import "../../node_modules/mapbox-gl/dist/mapbox-gl.css";
 
   export let measurements: Measurement[] = [];
-  export let session: any;
+  export let session: Session;
 
   let map: Map;
   let mapContainer: HTMLElement;

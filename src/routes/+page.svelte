@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
 
-  import type { Measurement } from "$lib/types";
+  import type { Measurement, Session } from "$lib/types";
+  type Sessions = { [ts in string]: Session };
 
   import Map from "$lib/Map.svelte";
 
@@ -19,13 +20,13 @@
     return measurements.sort((a, b) => a.timestamp - b.timestamp);
   };
 
-  const getSessions = async (): Promise<{ [key in string]: any }> => {
+  const getSessions = async (): Promise<Sessions> => {
     const resTxt = await fetch(`${DB_URL}/sessions.json`);
-    const sessions: { [key in string]: any } = await resTxt.json();
+    const sessions: Sessions = await resTxt.json();
     return sessions;
   };
 
-  const getSessionTimestamps = (sessions: { [key in string]: any }) => {
+  const getSessionTimestamps = (sessions: Sessions) => {
     return Object.keys(sessions)
       .map((v) => parseInt(v))
       .sort();
@@ -51,10 +52,10 @@
     });
 
   let currentSessionTimestamp: number;
-  let sessionsP: Promise<{ [key in string]: any }> = new Promise(() => {});
+  let sessionsP: Promise<Sessions> = new Promise(() => {});
   let measurementsP: Promise<Measurement[]> = new Promise(() => {});
 
-  let sessions: { [key in string]: any } = {};
+  let sessions: Sessions = {};
   let measurements: Measurement[] = [];
 
   onMount(async () => {

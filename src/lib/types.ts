@@ -18,4 +18,25 @@ type Measurement = SensorMeasurement & {
   timestamp: number;
 };
 
-export { Measurement, Sensors };
+type SessionValues = {
+  min: number;
+  max: number;
+  mean: number;
+};
+
+type SessionLoc = {
+  lat: SessionValues;
+  lon: SessionValues;
+};
+
+type SessionSensors = {
+  [S in Sensors]: SessionValues;
+};
+
+type Session = {
+  loc: SessionLoc;
+  sensors: SessionSensors;
+  pigeons: number[];
+};
+
+export { Measurement, Sensors, Session };
