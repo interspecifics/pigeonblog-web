@@ -44,14 +44,14 @@ const request = (method, url, data) => {
   });
 };
 
-const get_token = async (auth_url, api_key) => {
-  const post_url = `${auth_url}?key=${api_key}`;
+const getToken = async (auth_url, api_key) => {
+  const postUrl = `${auth_url}?key=${api_key}`;
 
   let token = "";
   try {
-    const res = await request("POST", post_url, { returnSecureToken: true });
-    const res_obj = JSON.parse(res);
-    token = res_obj["idToken"];
+    const resTxt = await request("POST", postUrl, { returnSecureToken: true });
+    const resObj = JSON.parse(resTxt);
+    token = resObj["idToken"];
   } catch (e) {
     token = "";
   }
@@ -59,71 +59,122 @@ const get_token = async (auth_url, api_key) => {
   return token;
 };
 
-const get_start_of_day = (ts) => {
+const getStartOfDay = (ts) => {
   return ts - (ts % (24 * 60 * 60 * 1000)) + 1000;
 };
 
-const get_first_measurement_after = async (ts) => {
-  const start_of_day = get_start_of_day(ts);
-  const start_of_next_day = start_of_day + 24 * 60 * 60 * 1000;
+const getAllMeasurements = async () => {
+  const getUrl = `${DB_URL}/measurements.json`;
 
-  const get_url = `${DB_URL}/measurements.json?orderBy="timestamp"&startAt=${start_of_next_day}&limitToFirst=1`;
-
-  let measurement = {};
+  let measurements = [];
   try {
-    const res = await request("GET", get_url, {});
-    const res_obj = JSON.parse(res);
-    measurement = Object.values(res_obj)[0];
+    const resTxt = await request("GET", getUrl, {});
+    const resObj = JSON.parse(resTxt);
+    measurements = Object.values(resObj).sort(
+      (a, b) => a.timestamp - b.timestamp
+    );
   } catch ({ name, message }) {
     if (name != "TypeError") console.log(name, message);
-    measurement = {};
+    measurements = [];
   }
-  return measurement;
+  return measurements;
 };
 
-const get_unique_days = async () => {
-  const unique_days = new Set();
+const roundTo = (n, d) => {
+  return parseFloat(n.toFixed(d));
+};
 
-  let latest_measurement = {
-    timestamp: 1000,
+const updateMinMax = (sessionVal, val) => {
+  if (val < sessionVal.min) sessionVal.min = roundTo(val, 4);
+  if (val > sessionVal.max) sessionVal.max = roundTo(val, 4);
+};
+
+const getMean = (arr) => {
+  return roundTo(arr.reduce((s, v) => s + v, 0) / arr.length, 4);
+};
+
+const getEmptyObj = () => {
+  return {
+    min: Number.MAX_VALUE,
+    max: -Number.MAX_VALUE,
+    values: [],
   };
-
-  while ("timestamp" in latest_measurement) {
-    latest_measurement = await get_first_measurement_after(
-      latest_measurement["timestamp"]
-    );
-    if ("timestamp" in latest_measurement) {
-      unique_days.add(get_start_of_day(latest_measurement["timestamp"]));
-    }
-  }
-
-  return unique_days;
 };
 
-const update_sessions = async (unique_days, token) => {
-  const del_url = `${DB_URL}/sessions.json?auth=${token}`;
+const processMeasurements = (measurements) => {
+  const measurementsByDay = {};
+
+  measurements.forEach((m) => {
+    const mDayKey = getStartOfDay(m.timestamp);
+    if (!(mDayKey in measurementsByDay)) {
+      measurementsByDay[mDayKey] = {
+        loc: {
+          lat: getEmptyObj(),
+          lon: getEmptyObj(),
+        },
+        sensors: {
+          NH3: getEmptyObj(),
+          OXI: getEmptyObj(),
+          RED: getEmptyObj(),
+        },
+        pigeons: new Set(),
+      };
+    }
+
+    measurementsByDay[mDayKey].pigeons.add(m.pigeon);
+
+    Object.entries(measurementsByDay[mDayKey].loc).forEach(([lk, lv]) => {
+      updateMinMax(lv, m[lk]);
+    });
+
+    Object.entries(measurementsByDay[mDayKey].sensors).forEach(([sk, sv]) => {
+      updateMinMax(sv, m[sk]);
+      sv.values.push(m[sk]);
+    });
+  });
+
+  Object.values(measurementsByDay).forEach((m) => {
+    m.pigeons = Array.from(m.pigeons).sort();
+
+    Object.values(m.loc).forEach((lv) => {
+      lv.mean = roundTo((lv.max + lv.min) / 2, 4);
+      delete lv.values;
+    });
+
+    Object.values(m.sensors).forEach((sv) => {
+      sv.mean = getMean(sv.values);
+      delete sv.values;
+    });
+  });
+
+  return measurementsByDay;
+};
+
+const updateSessions = async (measurementsBySession, token) => {
+  const delUrl = `${DB_URL}/sessions.json?auth=${token}`;
 
   try {
-    const res = await request("DELETE", del_url, {});
-    const res_obj = JSON.parse(res);
-    console.log(res_obj);
+    const resTxt = await request("DELETE", delUrl, {});
+    const resObj = JSON.parse(resTxt);
+    console.log(resObj);
   } catch (e) {
     console.log(e);
   }
 
-  Array.from(unique_days).forEach(async (d) => {
-    const put_url = `${DB_URL}/sessions/${String(d)}.json?auth=${token}`;
+  Object.keys(measurementsBySession).forEach(async (sk) => {
+    const putUrl = `${DB_URL}/sessions/${String(sk)}.json?auth=${token}`;
 
     try {
-      const res = await request("PUT", put_url, true);
-      const res_obj = JSON.parse(res);
-      console.log(d, res_obj);
+      const resTxt = await request("PUT", putUrl, measurementsBySession[sk]);
+      const resObj = JSON.parse(resTxt);
+      console.log(sk, resObj);
     } catch (e) {
       console.log(e);
     }
   });
 };
 
-const m_token = await get_token(AUTH_URL, API_KEY);
-const m_days = await get_unique_days();
-await update_sessions(m_days, m_token);
+const mToken = await getToken(AUTH_URL, API_KEY);
+const m = await getAllMeasurements();
+const pm = processMeasurements(m);
+updateSessions(pm, mToken);
