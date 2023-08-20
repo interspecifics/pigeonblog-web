@@ -3,7 +3,6 @@
 
   import type { Measurement } from "$lib/types";
 
-  import Card from "$lib/Card.svelte";
   import Map from "$lib/Map.svelte";
 
   const DB_URL = "https://pigeonblog-db-default-rtdb.firebaseio.com";
@@ -14,29 +13,32 @@
     const getUrl = `${DB_URL}/measurements.json`;
     const getParams = `orderBy="timestamp"&startAt=${dts}&endAt=${dtsp1}`;
 
-    const res = await fetch(`${getUrl}?${getParams}`);
-    const mObjs = await res.json();
-    const measurements: Measurement[] = Object.values(mObjs);
+    const resTxt = await fetch(`${getUrl}?${getParams}`);
+    const resObj = await resTxt.json();
+    const measurements: Measurement[] = Object.values(resObj);
     return measurements.sort((a, b) => a.timestamp - b.timestamp);
   };
 
-  const getSessions = async (): Promise<number[]> => {
-    const res = await fetch(`${DB_URL}/sessions.json`);
-    const sObjs = await res.json();
-    const sessions = Object.keys(sObjs).map((k) => parseInt(k));
+  const getSessions = async (): Promise<{ [key in string]: any }> => {
+    const resTxt = await fetch(`${DB_URL}/sessions.json`);
+    const sessions: { [key in string]: any } = await resTxt.json();
     return sessions;
+  };
+
+  const getSessionTimestamps = (sessions: { [key in string]: any }) => {
+    return Object.keys(sessions)
+      .map((v) => parseInt(v))
+      .sort();
+  };
+
+  const updateMeasurements = (currentSessionTimestamp: number) => {
+    measurementsP = getMeasurements(currentSessionTimestamp);
+    measurementsP.then((m) => (measurements = m));
   };
 
   const loadSession = (ev: Event): void => {
     const element = ev.target as HTMLSelectElement;
-    sessionTimestamp = parseInt(element.value);
-    measurementsP = getMeasurements(sessionTimestamp);
-    measurementsP.then((m) => (mapMeasurements = m));
-  };
-
-  const getPigeons = (ms: Measurement[]): number[] => {
-    const pigeonSet = ms.reduce((a, m) => a.add(m.pigeon), new Set<number>());
-    return Array.from(pigeonSet).sort();
+    currentSessionTimestamp = parseInt(element.value);
   };
 
   const toDate = (e: number): string =>
@@ -48,26 +50,30 @@
       day: "numeric",
     });
 
-  let sessionTimestamp: number;
-  let sessionsP: Promise<number[]> = new Promise(() => {});
+  let currentSessionTimestamp: number;
+  let sessionsP: Promise<{ [key in string]: any }> = new Promise(() => {});
   let measurementsP: Promise<Measurement[]> = new Promise(() => {});
-  let mapMeasurements: Measurement[] = [];
+
+  let sessions: { [key in string]: any } = {};
+  let measurements: Measurement[] = [];
 
   onMount(async () => {
     sessionsP = getSessions();
-    sessionsP.then((sessions) => {
-      sessionTimestamp = sessions[0];
-      measurementsP = getMeasurements(sessionTimestamp);
-      measurementsP.then((m) => (mapMeasurements = m));
+    sessionsP.then((sess) => {
+      sessions = sess;
+      currentSessionTimestamp = getSessionTimestamps(sessions)[0];
     });
   });
+
+  $: if (currentSessionTimestamp) updateMeasurements(currentSessionTimestamp);
+  $: currentSession = sessions[currentSessionTimestamp];
 </script>
 
 {#await sessionsP}
   <p>...waiting</p>
-{:then sessions}
+{:then pSessions}
   <select on:change={loadSession}>
-    {#each sessions as s}
+    {#each getSessionTimestamps(pSessions) as s}
       <option value={s}>{toDate(s)}</option>
     {/each}
   </select>
@@ -76,18 +82,20 @@
 {/await}
 
 <div>Pigeons:</div>
-{#await measurementsP}
+{#await sessionsP}
   <div>...waiting</div>
-{:then measurements}
-  <div>{getPigeons(measurements).join(", ")}</div>
+{:then}
+  <div>{currentSession.pigeons.join(", ")}</div>
 {:catch error}
   <p style="color: red">{error.message}</p>
 {/await}
 
-<Map measurements={mapMeasurements} />
+{#if currentSession}
+  <Map {measurements} session={currentSession} />
+{/if}
 
 {#await measurementsP}
   <div>...waiting</div>
-{:then measurements}
-  <div>Loaded {measurements.length} data points</div>
+{:then pMeasurements}
+  <div>Loaded {pMeasurements.length} data points</div>
 {/await}

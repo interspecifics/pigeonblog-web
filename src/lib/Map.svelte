@@ -6,6 +6,7 @@
   import "../../node_modules/mapbox-gl/dist/mapbox-gl.css";
 
   export let measurements: Measurement[] = [];
+  export let session: any;
 
   let map: Map;
   let mapContainer: HTMLElement;
@@ -14,11 +15,6 @@
     RED: "rgba(200, 20, 20, 0.5)",
     NH3: "rgba(20, 200, 20, 0.5)",
     OXI: "rgba(20, 20, 200, 0.5)",
-  };
-
-  const LOC = {
-    LAT: 33.941755,
-    LON: -118.1146035,
   };
 
   const updateMapSources = () => {
@@ -47,12 +43,21 @@
       };
     });
 
+    if (typeof map === "undefined" || map === null) return;
+
     Object.values(Sensors).forEach((sensor) => {
-      if (map?.getSource(sensor)) {
-        (map.getSource(sensor) as GeoJSONSource).setData(geoJson[sensor].data);
+      if (map.getSource(sensor)) {
+        const sensorSource = map.getSource(sensor) as GeoJSONSource;
+        sensorSource.setData(geoJson[sensor].data);
       } else {
-        map?.addSource(sensor, geoJson[sensor]);
+        map.addSource(sensor, geoJson[sensor]);
       }
+    });
+
+    map.flyTo({
+      center: [session.loc.lon.mean, session.loc.lat.mean],
+      zoom: 9,
+      curve: 0.75,
     });
   };
 
@@ -75,7 +80,7 @@
         "pk.eyJ1IjoidGhlcnNhbiIsImEiOiJjbGxmcTY0OGcwdzZxM3NuZ3YyMWpqb3Q4In0.LXXJ8kkXYy2eZa8x0g_6cA",
       container: mapContainer,
       style: "mapbox://styles/mapbox/streets-v12",
-      center: [LOC.LON, LOC.LAT],
+      center: [session.loc.lon.mean, session.loc.lat.mean],
       zoom: 9,
     });
 
