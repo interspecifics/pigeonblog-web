@@ -4,6 +4,7 @@
   import { type Measurement, Sensors, type Session } from "$lib/types";
 
   import PigeonMenu from "$lib/PigeonMenu.svelte";
+  import SensorMenu from "$lib/SensorMenu.svelte";
 
   import "../../node_modules/mapbox-gl/dist/mapbox-gl.css";
 
@@ -13,6 +14,7 @@
   let map: Map;
   let mapContainer: HTMLElement;
   let activePigeons: number[];
+  let activeSensors: Sensors[];
 
   const SENSOR_COLORS: { [key in Sensors]: string } = {
     RED: "#ff0000",
@@ -67,7 +69,7 @@
     });
   };
 
-  const updateLayerFilters = () => {
+  const updateLayerFilters = (): void => {
     if (!map.getLayer(`${Object.values(Sensors)[0]}-circle`)) return;
 
     Object.values(Sensors).forEach((sensor) => {
@@ -79,13 +81,14 @@
     });
   };
 
-  const toggleSensor = (ev: MouseEvent): void => {
-    const element = ev.target as HTMLDivElement;
-    const sensor = element.getAttribute("data-sensor-name") || "";
-    element.classList.toggle("active");
-    const isActive = element.classList.contains("active");
-    const visibilityValue = isActive ? "visible" : "none";
-    map.setLayoutProperty(`${sensor}-circle`, "visibility", visibilityValue);
+  const updateSensorVisibilities = (): void => {
+    if (!map.getLayer(`${Object.values(Sensors)[0]}-circle`)) return;
+
+    Object.values(Sensors).forEach((sensor) => {
+      const isActive = activeSensors.includes(sensor);
+      const visibilityValue = isActive ? "visible" : "none";
+      map.setLayoutProperty(`${sensor}-circle`, "visibility", visibilityValue);
+    });
   };
 
   const hideMapBoxAd = (): void => {
@@ -165,22 +168,15 @@
   $: if (activePigeons) {
     updateLayerFilters();
   }
+  $: if (activeSensors) {
+    updateSensorVisibilities();
+  }
 </script>
 
 <div class="map-container">
   <div id="map" class="map-element" bind:this={mapContainer} />
 
-  <div class="map-menu-container">
-    {#each Object.values(Sensors) as sensor}
-      <button
-        class="sensor-button active"
-        data-sensor-name={sensor}
-        on:click={toggleSensor}
-      >
-        {sensor}
-      </button>
-    {/each}
-  </div>
+  <SensorMenu bind:activeSensors />
 
   <PigeonMenu sessionPigeons={session.pigeons} bind:activePigeons />
 </div>
@@ -200,36 +196,5 @@
   .map-element {
     width: 100%;
     height: 100%;
-  }
-
-  .map-menu-container {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    display: flex;
-    flex-direction: column;
-    z-index: 10;
-
-    .sensor-button {
-      min-width: 70px;
-      padding: 8px 12px;
-      border: #222 1px solid;
-      background-color: #fff;
-      color: #222;
-      margin-bottom: 12px;
-      cursor: pointer;
-
-      &:hover {
-        background-color: #ddd;
-      }
-
-      &.active {
-        background-color: #3887be;
-        color: #ffffff;
-        &:hover {
-          background-color: #3074a4;
-        }
-      }
-    }
   }
 </style>
