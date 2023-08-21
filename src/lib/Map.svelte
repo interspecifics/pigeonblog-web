@@ -64,7 +64,7 @@
 
     map.flyTo({
       center: [session.loc.lon.mean, session.loc.lat.mean],
-      zoom: 9,
+      zoom: 10,
       curve: 0.75,
     });
   };
@@ -101,9 +101,10 @@
       accessToken:
         "pk.eyJ1IjoidGhlcnNhbiIsImEiOiJjbGxmcTY0OGcwdzZxM3NuZ3YyMWpqb3Q4In0.LXXJ8kkXYy2eZa8x0g_6cA",
       container: mapContainer,
-      style: "mapbox://styles/mapbox/streets-v12",
+      style: "mapbox://styles/thersan/clll2295d00cj01p2dzm9ft1r",
       center: [session.loc.lon.mean, session.loc.lat.mean],
-      zoom: 9,
+      zoom: 10,
+      cooperativeGestures: true,
     });
 
     map.on("load", () => {
@@ -153,7 +154,7 @@
               ["zoom"],
               8,
               0,
-              12,
+              13,
               1,
             ],
           },

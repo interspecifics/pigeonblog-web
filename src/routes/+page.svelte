@@ -89,5 +89,11 @@
 {#await measurementsP}
   <div>...waiting</div>
 {:then pMeasurements}
-  <div>Loaded {pMeasurements.length} data points</div>
+  <div class="data-info">Loaded {pMeasurements.length} data points</div>
 {/await}
+
+<style lang="scss">
+  .data-info {
+    color: #eee;
+  }
+</style>
