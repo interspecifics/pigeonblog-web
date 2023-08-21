@@ -43,7 +43,7 @@
       };
     });
 
-    if (typeof map === "undefined" || map === null) return;
+    if (typeof map === "undefined" || map === null || !map.isStyleLoaded()) return;
 
     Object.values(Sensors).forEach((sensor) => {
       if (map.getSource(sensor)) {
