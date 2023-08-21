@@ -12,9 +12,9 @@
   let mapContainer: HTMLElement;
 
   const SENSOR_COLORS: { [key in Sensors]: string } = {
-    RED: "rgba(200, 20, 20, 0.5)",
-    NH3: "rgba(20, 200, 20, 0.5)",
-    OXI: "rgba(20, 20, 200, 0.5)",
+    RED: "#ff0000",
+    NH3: "#00ff00",
+    OXI: "#0000ff",
   };
 
   const updateMapSources = () => {
@@ -43,7 +43,8 @@
       };
     });
 
-    if (typeof map === "undefined" || map === null || !map.isStyleLoaded()) return;
+    if (typeof map === "undefined" || map === null || !map.isStyleLoaded())
+      return;
 
     Object.values(Sensors).forEach((sensor) => {
       if (map.getSource(sensor)) {
@@ -66,7 +67,8 @@
     const sensor = element.getAttribute("data-sensor-name") || "";
     element.classList.toggle("active");
     const isActive = element.classList.contains("active");
-    map.setLayoutProperty(sensor, "visibility", isActive ? "visible" : "none");
+    const visibilityValue = isActive ? "visible" : "none";
+    map.setLayoutProperty(`${sensor}-circle`, "visibility", visibilityValue);
   };
 
   const hideMapBoxAd = (): void => {
@@ -90,22 +92,48 @@
 
       Object.values(Sensors).forEach((sensor) => {
         map.addLayer({
-          id: sensor,
+          id: `${sensor}-circle`,
           type: "circle",
           source: sensor,
+          minzoom: 8,
           layout: {
             visibility: "visible",
           },
           paint: {
-            "circle-color": SENSOR_COLORS[sensor],
             "circle-radius": [
               "interpolate",
               ["linear"],
               ["zoom"],
-              7,
-              ["*", ["-", ["get", "value"], 18], 1],
+              8,
+              [
+                "interpolate",
+                ["linear"],
+                ["get", "value"],
+                session.sensors[sensor].min,
+                4,
+                session.sensors[sensor].max + 0.001,
+                8,
+              ],
               15,
-              ["*", ["-", ["get", "value"], 18], 10],
+              [
+                "interpolate",
+                ["linear"],
+                ["get", "value"],
+                session.sensors[sensor].min,
+                8,
+                session.sensors[sensor].max + 0.001,
+                32,
+              ],
+            ],
+            "circle-color": SENSOR_COLORS[sensor],
+            "circle-opacity": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              8,
+              0,
+              12,
+              1,
             ],
           },
         });
