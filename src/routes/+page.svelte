@@ -71,7 +71,7 @@
 </script>
 
 {#await sessionsP}
-  <p>...waiting</p>
+  <div class="loading">...waiting</div>
 {:then pSessions}
   <select on:change={loadSession}>
     {#each getSessionTimestamps(pSessions) as s}
@@ -87,12 +87,15 @@
 {/if}
 
 {#await measurementsP}
-  <div>...waiting</div>
+  <div class="loading">...waiting</div>
 {:then pMeasurements}
   <div class="data-info">Loaded {pMeasurements.length} data points</div>
 {/await}
 
 <style lang="scss">
+  .loading {
+    color: #eee;
+  }
   .data-info {
     color: #eee;
   }

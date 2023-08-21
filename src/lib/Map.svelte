@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { type GeoJSONSource, Map } from "mapbox-gl";
+  import { type EventData, type GeoJSONSource, Map, Popup } from "mapbox-gl";
   import { type Measurement, Sensors, type Session } from "$lib/types";
 
   import PigeonMenu from "$lib/PigeonMenu.svelte";
@@ -12,6 +12,7 @@
   export let session: Session;
 
   let map: Map;
+  let mPopup: Popup;
   let mapContainer: HTMLElement;
   let activePigeons: number[];
   let activeSensors: Sensors[];
@@ -37,6 +38,10 @@
                 pigeon: m.pigeon,
                 sensor: sensor,
                 value: m[sensor],
+                temp: m.temp,
+                alti: m.alti,
+                pres: m.pres,
+                timestamp: m.timestamp,
               },
               geometry: {
                 type: "Point",
@@ -110,6 +115,7 @@
     map.on("load", () => {
       hideMapBoxAd();
       updateMapSources();
+      mPopup = new Popup();
 
       Object.values(Sensors).forEach((sensor, i) => {
         map.addLayer({
@@ -159,6 +165,33 @@
             ],
           },
         });
+
+        map.on("click", `${sensor}-circle`, (e: EventData): void => {
+          const topFeature: GeoJSON.Feature<GeoJSON.Point> = e.features[0];
+          const coords = topFeature.geometry.coordinates as [number, number];
+          const props = topFeature.properties;
+
+          if (typeof props === undefined || props === null) return;
+
+          const mHtml = `
+          Pigeon: ${props.pigeon}
+          (${new Date(props.timestamp).toLocaleTimeString("en-US", {
+            timeZone: "America/Los_Angeles",
+            hourCycle: "h23",
+          })})<br>
+          ${props.sensor}: ${props.value}<br>
+          Location: ${coords[1].toFixed(4)}, ${coords[0].toFixed(4)}`;
+
+          mPopup.setLngLat(coords).setHTML(mHtml).addTo(map);
+        });
+
+        map.on("mouseenter", `${sensor}-circle`, () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+
+        map.on("mouseleave", `${sensor}-circle`, () => {
+          map.getCanvas().style.cursor = "";
+        });
       });
     });
   });
@@ -167,9 +200,11 @@
     updateMapSources();
   }
   $: if (activePigeons) {
+    mPopup.remove();
     updateLayerFilters();
   }
   $: if (activeSensors) {
+    mPopup.remove();
     updateSensorVisibilities();
   }
 </script>
