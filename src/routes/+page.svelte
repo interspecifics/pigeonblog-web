@@ -82,15 +82,6 @@
   <p style="color: red">{error.message}</p>
 {/await}
 
-<div>Pigeons:</div>
-{#await sessionsP}
-  <div>...waiting</div>
-{:then}
-  <div>{currentSession.pigeons.join(", ")}</div>
-{:catch error}
-  <p style="color: red">{error.message}</p>
-{/await}
-
 {#if currentSession}
   <Map {measurements} session={currentSession} />
 {/if}

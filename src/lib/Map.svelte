@@ -3,6 +3,8 @@
   import { type GeoJSONSource, Map } from "mapbox-gl";
   import { type Measurement, Sensors, type Session } from "$lib/types";
 
+  import PigeonMenu from "$lib/PigeonMenu.svelte";
+
   import "../../node_modules/mapbox-gl/dist/mapbox-gl.css";
 
   export let measurements: Measurement[] = [];
@@ -10,6 +12,7 @@
 
   let map: Map;
   let mapContainer: HTMLElement;
+  let activePigeons: number[];
 
   const SENSOR_COLORS: { [key in Sensors]: string } = {
     RED: "#ff0000",
@@ -55,10 +58,24 @@
       }
     });
 
+    activePigeons = [...session.pigeons];
+
     map.flyTo({
       center: [session.loc.lon.mean, session.loc.lat.mean],
       zoom: 9,
       curve: 0.75,
+    });
+  };
+
+  const updateLayerFilters = () => {
+    if (!map.getLayer(`${Object.values(Sensors)[0]}-circle`)) return;
+
+    Object.values(Sensors).forEach((sensor) => {
+      map.setFilter(
+        `${sensor}-circle`,
+        ["in", ["get", "pigeon"], ["literal", activePigeons]],
+        { validate: false }
+      );
     });
   };
 
@@ -99,6 +116,7 @@
           layout: {
             visibility: "visible",
           },
+          filter: ["in", ["get", "pigeon"], ["literal", session.pigeons]],
           paint: {
             "circle-radius": [
               "interpolate",
@@ -144,6 +162,9 @@
   $: if (measurements.length > 0) {
     updateMapSources();
   }
+  $: if (activePigeons) {
+    updateLayerFilters();
+  }
 </script>
 
 <div class="map-container">
@@ -160,6 +181,8 @@
       </button>
     {/each}
   </div>
+
+  <PigeonMenu sessionPigeons={session.pigeons} bind:activePigeons />
 </div>
 
 <style lang="scss">
@@ -171,6 +194,7 @@
     width: 100%;
     height: 88vh;
     position: relative;
+    margin: 12px 0;
   }
 
   .map-element {
