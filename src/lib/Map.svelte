@@ -110,14 +110,14 @@
       hideMapBoxAd();
       updateMapSources();
 
-      Object.values(Sensors).forEach((sensor) => {
+      Object.values(Sensors).forEach((sensor, i) => {
         map.addLayer({
           id: `${sensor}-circle`,
           type: "circle",
           source: sensor,
           minzoom: 8,
           layout: {
-            visibility: "visible",
+            visibility: i == 0 ? "visible" : "none",
           },
           filter: ["in", ["get", "pigeon"], ["literal", session.pigeons]],
           paint: {

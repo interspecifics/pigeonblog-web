@@ -2,27 +2,37 @@
   import { Sensors } from "$lib/types";
 
   export let activeSensors: Sensors[];
-  const activeSensorsSet = new Set(Object.values(Sensors));
+  const activeSensorsSet = new Set(Object.values(Sensors).slice(0, 1));
 
-  const toggleSensor = (ev: MouseEvent): void => {
+  const updateSensors = (ev: MouseEvent): void => {
     const element = ev.target as HTMLDivElement;
-    const sensor = element.getAttribute("data-sensor-name") || "";
-    element.classList.toggle("active");
-    if (element.classList.contains("active")) {
-      activeSensorsSet.add(sensor as Sensors);
-    } else {
-      activeSensorsSet.delete(sensor as Sensors);
-    }
+    const allButtons = document.getElementsByClassName("sensor-button");
+
+    Array.from(allButtons)
+      .filter((el) => el == element || el.classList.contains("active"))
+      .forEach((el) => {
+        el.classList.toggle("active");
+      });
+
+    activeSensorsSet.clear();
+    Array.from(allButtons)
+      .filter((el) => el.classList.contains("active"))
+      .forEach((el) => {
+        const elSensor = el.getAttribute("data-sensor-name") || "";
+        activeSensorsSet.add(elSensor as Sensors);
+      });
+
     activeSensors = Array.from(activeSensorsSet);
   };
 </script>
 
 <div class="sensor-menu-container">
-  {#each Object.values(Sensors) as sensor}
+  {#each Object.values(Sensors) as sensor, i}
     <button
-      class="sensor-button active"
+      class="sensor-button"
+      class:active={i == 0}
       data-sensor-name={sensor}
-      on:click={toggleSensor}
+      on:click={updateSensors}
     >
       {sensor}
     </button>
@@ -50,6 +60,7 @@
       color: #222;
       margin-bottom: 12px;
       cursor: pointer;
+      user-select: none;
 
       &:hover {
         background-color: #ddd;
@@ -58,9 +69,7 @@
       &.active {
         background-color: #3887be;
         color: #ffffff;
-        &:hover {
-          background-color: #3074a4;
-        }
+        pointer-events: none;
       }
     }
   }

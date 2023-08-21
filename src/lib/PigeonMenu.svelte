@@ -3,7 +3,7 @@
   export let sessionPigeons: number[];
   $: activePigeonsSet = new Set(sessionPigeons);
 
-  const togglePigeons = (ev: MouseEvent): void => {
+  const updatePigeons = (ev: MouseEvent): void => {
     const element = ev.target as HTMLDivElement;
     const allButtons = document.getElementsByClassName("pigeon-button");
 
@@ -39,6 +39,7 @@
       el.classList.add("active");
     });
   };
+
   $: if (sessionPigeons) {
     resetElements();
   }
@@ -49,7 +50,7 @@
     <button
       class="pigeon-button active"
       data-pigeon-name={pigeon}
-      on:click={togglePigeons}
+      on:click={updatePigeons}
     >
       {pigeon}
     </button>
@@ -77,6 +78,7 @@
       color: #222;
       margin-bottom: 12px;
       cursor: pointer;
+      user-select: none;
 
       &:hover {
         background-color: #ddd;
