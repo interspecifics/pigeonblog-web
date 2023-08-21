@@ -17,9 +17,9 @@
   let activeSensors: Sensors[];
 
   const SENSOR_COLORS: { [key in Sensors]: string } = {
-    RED: "#ff0000",
-    NH3: "#00ff00",
-    OXI: "#0000ff",
+    RED: "#DB2C3C",
+    NH3: "#F9C80E",
+    OXI: "#455FA2",
   };
 
   const updateMapSources = () => {
