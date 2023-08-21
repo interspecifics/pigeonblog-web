@@ -5,16 +5,43 @@
 
   const togglePigeons = (ev: MouseEvent): void => {
     const element = ev.target as HTMLDivElement;
-    const pigeon = element.getAttribute("data-pigeon-name") || "";
-    element.classList.toggle("active");
+    const allButtons = document.getElementsByClassName("pigeon-button");
 
     if (element.classList.contains("active")) {
-      activePigeonsSet.add(parseInt(pigeon));
+      Array.from(allButtons)
+        .filter((el) => el != element)
+        .forEach((el) => {
+          el.classList.toggle("active");
+        });
     } else {
-      activePigeonsSet.delete(parseInt(pigeon));
+      Array.from(allButtons)
+        .filter((el) => el.classList.contains("active"))
+        .forEach((el) => {
+          el.classList.toggle("active");
+        });
+      element.classList.toggle("active");
     }
+
+    activePigeonsSet.clear();
+    Array.from(allButtons)
+      .filter((el) => el.classList.contains("active"))
+      .forEach((el) => {
+        const elPigeon = el.getAttribute("data-pigeon-name") || "";
+        activePigeonsSet.add(parseInt(elPigeon));
+      });
+
     activePigeons = Array.from(activePigeonsSet);
   };
+
+  const resetElements = (): void => {
+    const allButtons = document.getElementsByClassName("pigeon-button");
+    Array.from(allButtons).forEach((el) => {
+      el.classList.add("active");
+    });
+  };
+  $: if (sessionPigeons) {
+    resetElements();
+  }
 </script>
 
 <div class="pigeon-menu-container">
