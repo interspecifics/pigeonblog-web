@@ -3,9 +3,10 @@ name: pre-process db
 on:
   schedule:
     # min hour day month day-of-week
+    # UTC = (LA + 7) = (NY + 4)
+    # LA: 17h-0h, 10h,12h,14h,16h
     - cron: "0 0-7 * * *"
-    - cron: "0 13,18,21,23 * * *"
-    - cron: "30 3 23 8 *"
+    - cron: "0 17,19,21,23 * * *"
 
 jobs:
   build:
