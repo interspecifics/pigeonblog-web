@@ -125,6 +125,7 @@ const processMeasurements = (measurements) => {
 
     Object.entries(measurementsByDay[mDayKey].loc).forEach(([lk, lv]) => {
       updateMinMax(lv, m[lk]);
+      lv.values.push(m[lk]);
     });
 
     Object.entries(measurementsByDay[mDayKey].sensors).forEach(([sk, sv]) => {
@@ -137,7 +138,7 @@ const processMeasurements = (measurements) => {
     m.pigeons = Array.from(m.pigeons).sort();
 
     Object.values(m.loc).forEach((lv) => {
-      lv.mean = roundTo((lv.max + lv.min) / 2, 4);
+      lv.mean = getMean(lv.values);
       delete lv.values;
     });
 
