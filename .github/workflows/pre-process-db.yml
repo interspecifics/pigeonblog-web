@@ -1,0 +1,23 @@
+name: pre-process db
+
+on:
+  schedule:
+    # min hour day month day-of-week
+    - cron: "0 0-7 * * *"
+    - cron: "0 13,18,21,23 * * *"
+    - cron: "3 30 23 8 *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: update sessions in db
+        run: npm run update-sessions
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
