@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Sensors } from "$lib/types";
 
-  export let activeSensors: Sensors[];
+  export let activeSensors: Array<Sensors>;
   const activeSensorsSet = new Set(Object.values(Sensors).slice(0, 1));
 
   const updateSensors = (ev: MouseEvent): void => {

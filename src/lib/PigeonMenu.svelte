@@ -1,6 +1,6 @@
 <script lang="ts">
-  export let activePigeons: number[];
-  export let sessionPigeons: number[];
+  export let activePigeons: Array<number>;
+  export let sessionPigeons: Array<number>;
   $: activePigeonsSet = new Set(sessionPigeons);
 
   const updatePigeons = (ev: MouseEvent): void => {

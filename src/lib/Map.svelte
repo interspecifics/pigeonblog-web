@@ -8,14 +8,14 @@
 
   import "../../node_modules/mapbox-gl/dist/mapbox-gl.css";
 
-  export let measurements: Measurement[] = [];
+  export let measurements: Array<Measurement> = [];
   export let session: Session;
 
   let map: Map;
   let mPopup: Popup;
   let mapContainer: HTMLElement;
-  let activePigeons: number[];
-  let activeSensors: Sensors[];
+  let activePigeons: Array<number>;
+  let activeSensors: Array<Sensors>;
 
   const SENSOR_COLORS: { [key in Sensors]: string } = {
     RED: "#DB2C3C",
