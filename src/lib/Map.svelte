@@ -83,6 +83,33 @@
         ["in", ["get", "pigeon"], ["literal", activePigeons]],
         { validate: false }
       );
+
+      // TODO: put this in a function
+      map.setPaintProperty(`${sensor}-circle`, "circle-radius", [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        8,
+        [
+          "interpolate",
+          ["linear"],
+          ["get", "value"],
+          session.sensors[sensor].min,
+          4,
+          session.sensors[sensor].max + 0.001,
+          8,
+        ],
+        15,
+        [
+          "interpolate",
+          ["linear"],
+          ["get", "value"],
+          session.sensors[sensor].min,
+          8,
+          session.sensors[sensor].max + 0.001,
+          32,
+        ],
+      ]);
     });
   };
 
