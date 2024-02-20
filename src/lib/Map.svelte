@@ -17,12 +17,6 @@
   let activePigeons: Array<number>;
   let activeSensors: Array<Sensors>;
 
-  // const SENSOR_COLORS: { [key in Sensors]: string } = {
-  //   RED: "#DB2C3C",
-  //   NH3: "#F9C80E",
-  //   OXI: "#455FA2",
-  // };
-
   const MAP_COLORS: string[] = [
     "#DB2C3C",
     "#F9C80E",

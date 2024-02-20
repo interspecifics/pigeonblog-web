@@ -1,8 +1,4 @@
 enum Sensors {
-  NH3 = "NH3",
-  OXI = "OXI",
-  RED = "RED",
-  //
   aqi = "aqi",
   co = "co",
   co2 = "co2",

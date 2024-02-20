@@ -77,6 +77,7 @@ const getAllMeasurements = async () => {
     if (name != "TypeError") console.log(name, message);
     measurements = [];
   }
+
   return measurements;
 };
 
@@ -113,9 +114,6 @@ const processMeasurements = (measurements) => {
           lon: getEmptyObj(),
         },
         sensors: {
-          NH3: getEmptyObj(),
-          OXI: getEmptyObj(),
-          RED: getEmptyObj(),
           aqi: getEmptyObj(),
           co: getEmptyObj(),
           co2: getEmptyObj(),
