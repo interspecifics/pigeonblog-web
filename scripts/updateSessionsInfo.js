@@ -116,6 +116,13 @@ const processMeasurements = (measurements) => {
           NH3: getEmptyObj(),
           OXI: getEmptyObj(),
           RED: getEmptyObj(),
+          aqi: getEmptyObj(),
+          co: getEmptyObj(),
+          co2: getEmptyObj(),
+          eth: getEmptyObj(),
+          h2: getEmptyObj(),
+          meth: getEmptyObj(),
+          tvocs: getEmptyObj(),
         },
         pigeons: new Set(),
       };
@@ -124,13 +131,15 @@ const processMeasurements = (measurements) => {
     measurementsByDay[mDayKey].pigeons.add(m.pigeon);
 
     Object.entries(measurementsByDay[mDayKey].loc).forEach(([lk, lv]) => {
-      updateMinMax(lv, m[lk]);
-      lv.values.push(m[lk]);
+      const cleanVal = (lk in m) ? m[lk] : 0;
+      updateMinMax(lv, cleanVal);
+      lv.values.push(cleanVal);
     });
 
     Object.entries(measurementsByDay[mDayKey].sensors).forEach(([sk, sv]) => {
-      updateMinMax(sv, m[sk]);
-      sv.values.push(m[sk]);
+      const cleanVal = (sk in m) ? m[sk] : 0;
+      updateMinMax(sv, cleanVal);
+      sv.values.push(cleanVal);
     });
   });
 

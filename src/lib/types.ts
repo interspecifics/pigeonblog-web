@@ -2,6 +2,14 @@ enum Sensors {
   NH3 = "NH3",
   OXI = "OXI",
   RED = "RED",
+  //
+  aqi = "aqi",
+  co = "co",
+  co2 = "co2",
+  eth = "eth",
+  h2 = "h2",
+  meth = "meth",
+  tvocs = "tvocs"
 }
 
 type SensorMeasurement = {
