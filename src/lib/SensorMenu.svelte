@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { Sensors } from "$lib/types";
+  import type { Sensors } from "$lib/types";
+  import { SENSORS } from "$lib/constants";
 
   export let activeSensors: Array<Sensors>;
-  const activeSensorsSet = new Set(Object.values(Sensors).slice(0, 1));
+
+  const activeSensorsSet = new Set([SENSORS[0].id]);
 
   const updateSensors = (ev: MouseEvent): void => {
     const element = ev.target as HTMLDivElement;
@@ -19,7 +21,8 @@
       .filter((el) => el.classList.contains("active"))
       .forEach((el) => {
         const elSensor = el.getAttribute("data-sensor-name") || "";
-        activeSensorsSet.add(elSensor as Sensors);
+        const mSensor = SENSORS.filter(s => s.id === elSensor)[0];
+        activeSensorsSet.add(mSensor.id);
       });
 
     activeSensors = Array.from(activeSensorsSet);
@@ -27,14 +30,14 @@
 </script>
 
 <div class="sensor-menu-container">
-  {#each Object.values(Sensors) as sensor, i}
+  {#each SENSORS as sensor, i}
     <button
       class="sensor-button"
       class:active={i == 0}
-      data-sensor-name={sensor}
+      data-sensor-name={sensor.id}
       on:click={updateSensors}
     >
-      {sensor}
+      {sensor.name}
     </button>
   {/each}
 </div>

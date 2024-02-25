@@ -43,4 +43,22 @@ type Session = {
   pigeons: number[];
 };
 
-export { Measurement, Sensors, Session };
+type SensorInfo = {
+  name: string;
+  id: Sensors;
+  min: number;
+  max: number;
+  levels: [number, number, number, number, number];
+  info: string;
+};
+
+type PigeonInfo = {
+  name: string;
+  id: string; // ????
+  weight: number;
+  age: number;
+  info: string;
+};
+
+export type { Measurement, PigeonInfo, Session, SensorInfo };
+export { Sensors };

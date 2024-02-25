@@ -1,8 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { type EventData, type GeoJSONSource, Map, Popup } from "mapbox-gl";
-  import { type Measurement, Sensors, type Session } from "$lib/types";
+  import type { Measurement, Sensors, Session } from "$lib/types";
 
+  import { SENSORS } from "$lib/constants";
   import PigeonMenu from "$lib/PigeonMenu.svelte";
   import SensorMenu from "$lib/SensorMenu.svelte";
 
@@ -26,8 +27,8 @@
   const updateMapSources = () => {
     const geoJson: { [sensorId: string]: any } = {};
 
-    Object.values(Sensors).forEach((sensor) => {
-      geoJson[sensor] = {
+    SENSORS.forEach((sensor) => {
+      geoJson[sensor.id] = {
         type: "geojson",
         data: {
           type: "FeatureCollection",
@@ -36,8 +37,8 @@
               type: "Feature",
               properties: {
                 pigeon: m.pigeon,
-                sensor: sensor,
-                value: m[sensor],
+                sensorname: sensor.name,
+                value: m[sensor.id],
                 temp: m.temp,
                 alti: m.alti,
                 pres: m.pres,
@@ -56,12 +57,12 @@
     if (typeof map === "undefined" || map === null || !map.isStyleLoaded())
       return;
 
-    Object.values(Sensors).forEach((sensor) => {
-      if (map.getSource(sensor)) {
-        const sensorSource = map.getSource(sensor) as GeoJSONSource;
-        sensorSource.setData(geoJson[sensor].data);
+    SENSORS.forEach((sensor) => {
+      if (map.getSource(sensor.id)) {
+        const sensorSource = map.getSource(sensor.id) as GeoJSONSource;
+        sensorSource.setData(geoJson[sensor.id].data);
       } else {
-        map.addSource(sensor, geoJson[sensor]);
+        map.addSource(sensor.id, geoJson[sensor.id]);
       }
     });
 
@@ -75,17 +76,17 @@
   };
 
   const updateLayerFilters = (): void => {
-    if (!map.getLayer(`${Object.values(Sensors)[0]}-circle`)) return;
+    if (!map.getLayer(`${SENSORS[0].id}-circle`)) return;
 
-    Object.values(Sensors).forEach((sensor) => {
+    SENSORS.forEach((sensor) => {
       map.setFilter(
-        `${sensor}-circle`,
+        `${sensor.id}-circle`,
         ["in", ["get", "pigeon"], ["literal", activePigeons]],
         { validate: false }
       );
 
       // TODO: put this in a function
-      map.setPaintProperty(`${sensor}-circle`, "circle-radius", [
+      map.setPaintProperty(`${sensor.id}-circle`, "circle-radius", [
         "interpolate",
         ["linear"],
         ["zoom"],
@@ -94,9 +95,9 @@
           "interpolate",
           ["linear"],
           ["get", "value"],
-          session.sensors[sensor].min,
+          session.sensors[sensor.id].min,
           4,
-          session.sensors[sensor].max + 0.001,
+          session.sensors[sensor.id].max + 0.001,
           8,
         ],
         15,
@@ -104,9 +105,9 @@
           "interpolate",
           ["linear"],
           ["get", "value"],
-          session.sensors[sensor].min,
+          session.sensors[sensor.id].min,
           8,
-          session.sensors[sensor].max + 0.001,
+          session.sensors[sensor.id].max + 0.001,
           32,
         ],
       ]);
@@ -114,12 +115,12 @@
   };
 
   const updateSensorVisibilities = (): void => {
-    if (!map.getLayer(`${Object.values(Sensors)[0]}-circle`)) return;
+    if (!map.getLayer(`${SENSORS[0].id}-circle`)) return;
 
-    Object.values(Sensors).forEach((sensor) => {
-      const isActive = activeSensors.includes(sensor);
+    SENSORS.forEach((sensor) => {
+      const isActive = activeSensors.includes(sensor.id);
       const visibilityValue = isActive ? "visible" : "none";
-      map.setLayoutProperty(`${sensor}-circle`, "visibility", visibilityValue);
+      map.setLayoutProperty(`${sensor.id}-circle`, "visibility", visibilityValue);
     });
   };
 
@@ -144,11 +145,11 @@
       updateMapSources();
       mPopup = new Popup();
 
-      Object.values(Sensors).forEach((sensor, i) => {
+      SENSORS.forEach((sensor, i) => {
         map.addLayer({
-          id: `${sensor}-circle`,
+          id: `${sensor.id}-circle`,
           type: "circle",
-          source: sensor,
+          source: sensor.id,
           minzoom: 8,
           layout: {
             visibility: i == 0 ? "visible" : "none",
@@ -164,9 +165,9 @@
                 "interpolate",
                 ["linear"],
                 ["get", "value"],
-                session.sensors[sensor].min,
+                session.sensors[sensor.id].min,
                 4,
-                session.sensors[sensor].max + 0.001,
+                session.sensors[sensor.id].max + 0.001,
                 8,
               ],
               15,
@@ -174,9 +175,9 @@
                 "interpolate",
                 ["linear"],
                 ["get", "value"],
-                session.sensors[sensor].min,
+                session.sensors[sensor.id].min,
                 8,
-                session.sensors[sensor].max + 0.001,
+                session.sensors[sensor.id].max + 0.001,
                 32,
               ],
             ],
@@ -193,7 +194,7 @@
           },
         });
 
-        map.on("click", `${sensor}-circle`, (e: EventData): void => {
+        map.on("click", `${sensor.id}-circle`, (e: EventData): void => {
           const topFeature: GeoJSON.Feature<GeoJSON.Point> = e.features[0];
           const coords = topFeature.geometry.coordinates as [number, number];
           const props = topFeature.properties;
@@ -206,17 +207,17 @@
             timeZone: "America/Los_Angeles",
             hourCycle: "h23",
           })})<br>
-          ${props.sensor}: ${props.value}<br>
+          ${props.sensorname}: ${props.value}<br>
           Location: ${coords[1].toFixed(4)}, ${coords[0].toFixed(4)}`;
 
           mPopup.setLngLat(coords).setHTML(mHtml).addTo(map);
         });
 
-        map.on("mouseenter", `${sensor}-circle`, () => {
+        map.on("mouseenter", `${sensor.id}-circle`, () => {
           map.getCanvas().style.cursor = "pointer";
         });
 
-        map.on("mouseleave", `${sensor}-circle`, () => {
+        map.on("mouseleave", `${sensor.id}-circle`, () => {
           map.getCanvas().style.cursor = "";
         });
       });
