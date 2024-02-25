@@ -3,12 +3,31 @@ import { Sensors } from "$lib/types";
 
 const SENSORS: SensorInfo[] = [
   {
+    name: "Carbon Dioxide",
+    id: Sensors.co2,
+    min: 400,
+    max: 6500,
+    levels: [400, 600, 800, 1000, 1500],
+    units: "ppm",
+    info: "Carbon Dioxide is...."
+  },
+  {
+    name: "TVOC",
+    id: Sensors.tvocs,
+    min: 0,
+    max: 6500,
+    levels: [0, 65, 220, 650, 2200],
+    units: "ppb",
+    info: "Total Volatile Organic Compounds...."
+  },
+  {
     name: "Air Quality Index",
     id: Sensors.aqi,
-    min: 0,
-    max: 100,
-    levels: [0, 10, 20, 40, 100],
-    info: "The Air Quality Index measurement...."
+    min: 1,
+    max: 5,
+    levels: [1, 2, 3, 4, 5],
+    units: "",
+    info: "The AQI-UBA air quality index is derived from a guideline by the German Federal Environmental Agency (UBA: Umweltbundesamt) based on a TVOC sum signal. Although a local German guideline, it is referenced and adopted by many countries and organizations.<br><br>Recommendation according to the UBA, Bundesgesundheitsblatt - Gesundheitsforschung Gesundheitsschutz 2007, DOI 10.1007/s00103-007-0290-y."
   },
   {
     name: "Carbon Monoxide",
@@ -16,22 +35,16 @@ const SENSORS: SensorInfo[] = [
     min: 0,
     max: 100,
     levels: [0, 20, 40, 60, 80],
+    units: "",
     info: "Carbon Monoxide is...."
-  },
-  {
-    name: "Carbon Dioxide",
-    id: Sensors.co2,
-    min: 0,
-    max: 100,
-    levels: [20, 40, 60, 80, 100],
-    info: "Carbon Dioxide is...."
   },
   {
     name: "Ethanol",
     id: Sensors.eth,
     min: 0,
     max: 100,
-    levels: [0, 10, 20, 40, 100],
+    levels: [0, 10, 20, 40, 80],
+    units: "",
     info: "Ethanol...."
   },
   {
@@ -40,6 +53,7 @@ const SENSORS: SensorInfo[] = [
     min: 0,
     max: 100,
     levels: [0, 20, 40, 60, 80],
+    units: "",
     info: "Hydrogen measures...."
   },
   {
@@ -47,16 +61,9 @@ const SENSORS: SensorInfo[] = [
     id: Sensors.meth,
     min: 0,
     max: 100,
-    levels: [20, 40, 60, 80, 100],
+    levels: [0, 10, 20, 30, 40],
+    units: "",
     info: "Methane is...."
-  },
-  {
-    name: "TVOC",
-    id: Sensors.tvocs,
-    min: 0,
-    max: 100,
-    levels: [0, 10, 20, 40, 100],
-    info: "Total Volatile Organic Compounds...."
   },
 ];
 

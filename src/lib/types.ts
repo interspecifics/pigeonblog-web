@@ -49,6 +49,7 @@ type SensorInfo = {
   min: number;
   max: number;
   levels: [number, number, number, number, number];
+  units: string;
   info: string;
 };
 
