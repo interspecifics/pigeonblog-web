@@ -68,7 +68,7 @@
     left: 12px;
     display: flex;
     flex-direction: column;
-    z-index: 10;
+    gap: 14px;
 
     .pigeon-button {
       min-width: 70px;
@@ -76,7 +76,6 @@
       border: #222 1px solid;
       background-color: #fff;
       color: #222;
-      margin-bottom: 12px;
       cursor: pointer;
       user-select: none;
 

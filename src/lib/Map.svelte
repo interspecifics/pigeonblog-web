@@ -231,7 +231,7 @@
     mPopup.remove();
     updateLayerFilters();
   }
-  $: if (activeSensors) {
+  $: if (activeSensors && mPopup) {
     mPopup.remove();
     updateSensorVisibilities();
   }
