@@ -69,6 +69,10 @@
         color: #ffffff;
         pointer-events: none;
       }
+
+      &:hover {
+        background-color: #ddd;
+      }
     }
 
     &.show {
