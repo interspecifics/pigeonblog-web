@@ -27,7 +27,7 @@ const SENSORS: SensorInfo[] = [
     max: 5,
     levels: [1, 2, 3, 4, 5],
     units: "",
-    info: "The AQI-UBA air quality index is derived from a guideline by the German Federal Environmental Agency (UBA: Umweltbundesamt) based on a TVOC sum signal. Although a local German guideline, it is referenced and adopted by many countries and organizations.<br><br>Recommendation according to the UBA, Bundesgesundheitsblatt - Gesundheitsforschung Gesundheitsschutz 2007, DOI 10.1007/s00103-007-0290-y."
+    info: "The AQI-UBA air quality index is derived from a guideline by the German Federal Environmental Agency (UBA: Umweltbundesamt) based on a TVOC sum signal.\n\nAlthough a local German guideline, it is referenced and adopted by many countries and organizations.\n\nRecommendation according to the UBA, Bundesgesundheitsblatt - Gesundheitsforschung Gesundheitsschutz 2007, DOI 10.1007/s00103-007-0290-y."
   },
   {
     name: "Carbon Monoxide",
