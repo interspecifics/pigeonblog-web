@@ -43,7 +43,7 @@
 <div class="sensor-info-overlay" class:show={0} bind:this={mOverlay}>
   <div class="sensor-info-container" bind:this={mSensorInfoContainer}>
     <h3>{mSensorInfo.name}</h3>
-    <p>{mSensorInfo.info}</p>
+    <p>{@html mSensorInfo.info}</p>
   </div>
 </div>
 
