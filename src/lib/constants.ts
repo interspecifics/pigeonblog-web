@@ -69,46 +69,60 @@ const SENSORS: SensorInfo[] = [
 
 const PIGEONS: PigeonInfo[] = [
   {
+    name: "NO Pigeon",
+    id: -1,
+    weight: 0,
+    age: 0,
+    info: ""
+  },
+  {
     name: "Pigeon 0",
-    id: "Pigeon 0",
+    id: 0,
     weight: 4,
     age: 12,
-    info: "Total Volatile Organic Compounds...."
+    info: "This pigeon...."
   },
   {
     name: "Pigeon 1",
-    id: "Pigeon 1",
+    id: 1,
     weight: 4,
     age: 12,
-    info: "Total Volatile Organic Compounds...."
+    info: "Another pigeon...."
   },
   {
     name: "Pigeon 2",
-    id: "Pigeon 2",
+    id: 2,
     weight: 4,
     age: 12,
-    info: "Total Volatile Organic Compounds...."
+    info: "More pigeon...."
   },
   {
     name: "Pigeon 3",
-    id: "Pigeon 3",
+    id: 3,
     weight: 4,
     age: 12,
-    info: "Total Volatile Organic Compounds...."
+    info: "Cool pigeon...."
   },
   {
     name: "Pigeon 4",
-    id: "Pigeon 4",
+    id: 4,
     weight: 4,
     age: 12,
-    info: "Total Volatile Organic Compounds...."
+    info: "Fast pigeon...."
   },
   {
     name: "Pigeon 5",
-    id: "Pigeon 5",
+    id: 5,
     weight: 4,
     age: 12,
-    info: "Total Volatile Organic Compounds...."
+    info: "Hungry pigeon...."
+  },
+  {
+    name: "Test Pigeon",
+    id: 9999,
+    weight: 8,
+    age: 10,
+    info: "Test Pigeon."
   },
 ];
 

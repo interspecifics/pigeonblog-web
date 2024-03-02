@@ -55,7 +55,7 @@ type SensorInfo = {
 
 type PigeonInfo = {
   name: string;
-  id: string; // ????
+  id: number;
   weight: number;
   age: number;
   info: string;

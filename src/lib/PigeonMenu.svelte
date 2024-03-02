@@ -1,4 +1,9 @@
 <script lang="ts">
+  import { PIGEONS } from "$lib/constants";
+
+  import PigeonInfoCard from "./PigeonInfoCard.svelte";
+  import type { PigeonInfo } from "./types";
+
   export let activePigeons: Array<number>;
   export let sessionPigeons: Array<number>;
   $: activePigeonsSet = new Set(sessionPigeons);
@@ -40,6 +45,13 @@
     });
   };
 
+  const getPigeonInfo = (pid: number): PigeonInfo => {
+    const byId = PIGEONS.filter(p => p.id == pid);
+    const noId = PIGEONS.filter(p => p.id == -1);
+    const pInfo = byId.length > 0 ? byId[0] : noId[0];
+    return pInfo
+  };
+
   $: if (sessionPigeons) {
     resetElements();
   }
@@ -47,13 +59,16 @@
 
 <div class="pigeon-menu-container">
   {#each sessionPigeons as pigeon}
-    <button
-      class="pigeon-button active"
-      data-pigeon-name={pigeon}
-      on:click={updatePigeons}
-    >
-      {pigeon}
-    </button>
+    <div class="pigeon-menu-item">
+      <button
+        class="pigeon-button active"
+        data-pigeon-name={pigeon}
+        on:click={updatePigeons}
+      >
+        {pigeon}
+      </button>
+      <PigeonInfoCard mPigeonInfo={getPigeonInfo(pigeon)} {activePigeons} />
+    </div>
   {/each}
 </div>
 
@@ -70,24 +85,31 @@
     flex-direction: column;
     gap: 14px;
 
-    .pigeon-button {
-      min-width: 70px;
-      padding: 8px 12px;
-      border: #222 1px solid;
-      background-color: #fff;
-      color: #222;
-      cursor: pointer;
-      user-select: none;
+    .pigeon-menu-item {
+      display: flex;
+      flex-direction: row;
+      gap: 1px;
+      align-items: center;
 
-      &:hover {
-        background-color: #ddd;
-      }
+      .pigeon-button {
+        min-width: 70px;
+        padding: 8px 12px;
+        border: #222 1px solid;
+        background-color: #fff;
+        color: #222;
+        cursor: pointer;
+        user-select: none;
 
-      &.active {
-        background-color: #3887be;
-        color: #ffffff;
         &:hover {
-          background-color: #3074a4;
+          background-color: #ddd;
+        }
+
+        &.active {
+          background-color: #3887be;
+          color: #ffffff;
+          &:hover {
+            background-color: #3074a4;
+          }
         }
       }
     }
