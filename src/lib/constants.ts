@@ -34,9 +34,9 @@ const SENSORS: SensorInfo[] = [
     id: Sensors.co,
     min: 0,
     max: 2000,
-    levels: [0, 20, 400, 1000, 1800],
+    levels: [0, 9, 50, 200, 800],
     units: "ppm",
-    info: "Carbon Monoxide is...."
+    info: "Carbon Monoxide is....<br><br>https://www.co2meter.com/blogs/news/carbon-monoxide-levels-chart<br>https://www.spec-sensors.com/wp-content/uploads/2016/05/Carbon-Monoxide-Risks-at-Low-Levels.pdf"
   },
   {
     name: "Ethanol",
